@@ -1,0 +1,211 @@
+:root {
+  --bg: #0f1419;
+  --surface: #1a222c;
+  --surface-2: #243040;
+  --text: #eef3f8;
+  --muted: #9aabbc;
+  --accent: #ff5a36;
+  --accent-2: #3dd6c6;
+  --danger: #ff6b81;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 90, 54, 0.18), transparent 35%),
+    radial-gradient(circle at top right, rgba(61, 214, 198, 0.14), transparent 30%),
+    var(--bg);
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page,
+.auth-page {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.auth-card,
+.note-card,
+.note-detail,
+.empty {
+  background: color-mix(in srgb, var(--surface) 92%, white 8%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  padding: 2rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.auth-card h1,
+.topbar h1,
+.note-detail h1 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  letter-spacing: -0.03em;
+}
+
+.auth-card p,
+.topbar p,
+.muted {
+  color: var(--muted);
+  margin: 0;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.92rem;
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+}
+
+button,
+.note-actions a {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+  background: linear-gradient(135deg, var(--accent), #ff8a4c);
+  color: #111;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+button.danger {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid color-mix(in srgb, var(--danger) 50%, transparent);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.note-card,
+.note-detail,
+.empty {
+  padding: 1.25rem;
+}
+
+.note-card h2,
+.note-detail h2,
+.empty h2 {
+  margin: 0.4rem 0 0.7rem;
+  font-size: 1.15rem;
+}
+
+.note-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.note-actions a {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.error {
+  background: rgba(255, 107, 129, 0.12);
+  border: 1px solid rgba(255, 107, 129, 0.35);
+  color: #ffd0d7;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.summary {
+  white-space: pre-wrap;
+  background: var(--surface-2);
+  border-radius: 12px;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.section-block {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
