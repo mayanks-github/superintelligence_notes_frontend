@@ -24,13 +24,21 @@ export default function NoteDetailPage() {
 
   return (
     <main className="page">
-      <Link to="/" className="back">← Back to notes</Link>
+      <Link
+        to={note?.video_id ? `/videos/${encodeURIComponent(note.video_id)}` : '/'}
+        className="back"
+      >
+        ← Back
+      </Link>
 
       {error && <div className="error">{error}</div>}
 
       {note && (
         <article className="note-detail">
-          <h1>{note.video_title || note.video_id}</h1>
+          <h1>{note.title || note.video_title || note.video_id}</h1>
+          {note.video_title && note.title && note.title !== note.video_title && (
+            <p className="muted">{note.video_title}</p>
+          )}
           <div className="note-meta">
             <span>{note.source}</span>
             <span>{new Date(note.captured_at).toLocaleString()}</span>

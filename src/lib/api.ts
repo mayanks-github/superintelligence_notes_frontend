@@ -14,6 +14,7 @@ export type NoteSection = {
 
 export type Note = {
   id: string
+  title?: string | null
   video_id: string
   video_title: string | null
   video_url: string | null
@@ -24,6 +25,25 @@ export type Note = {
   created_at: string
   updated_at: string
   web_view_link?: string | null
+}
+
+export type VideoNoteSummary = {
+  id: string
+  title: string | null
+  source: string | null
+  captured_at: string | null
+  created_at: string | null
+  web_view_link?: string | null
+}
+
+export type Video = {
+  video_id: string
+  video_title: string
+  video_url: string | null
+  thumbnail_url: string | null
+  notes_count: number
+  notes: VideoNoteSummary[]
+  latest_captured_at: string | null
 }
 
 function authHeaders(): HeadersInit {
@@ -62,7 +82,17 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const api = {
   me: () => request<{ user: User }>('/auth/me'),
 
-  listNotes: () => request<{ notes: Note[] }>('/notes'),
+  listVideos: () => request<{ videos: Video[] }>('/videos'),
+
+  getVideo: (videoId: string) =>
+    request<{ video: Video }>(`/videos/${encodeURIComponent(videoId)}`),
+
+  listNotes: (videoId?: string) => {
+    const query = videoId
+      ? `?video_id=${encodeURIComponent(videoId)}`
+      : ''
+    return request<{ notes: Note[] }>(`/notes${query}`)
+  },
 
   getNote: (id: string) => request<{ note: Note }>(`/notes/${id}`),
 

@@ -3,7 +3,8 @@ import { AuthProvider } from './context/AuthContext'
 import AuthCallbackPage from './pages/AuthCallbackPage'
 import LoginPage from './pages/LoginPage'
 import NoteDetailPage from './pages/NoteDetailPage'
-import NotesPage from './pages/NotesPage'
+import VideoDetailPage from './pages/VideoDetailPage'
+import VideosPage from './pages/VideosPage'
 import './App.css'
 
 export default function App() {
@@ -11,7 +12,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<NotesPage />} />
+          <Route path="/" element={<VideosPage />} />
+          <Route path="/videos/:videoId" element={<VideoDetailPage />} />
           <Route path="/notes/:id" element={<NoteDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />

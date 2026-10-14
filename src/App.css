@@ -53,6 +53,8 @@ input {
 .auth-card,
 .note-card,
 .note-detail,
+.video-card,
+.video-detail,
 .empty {
   background: color-mix(in srgb, var(--surface) 92%, white 8%);
   border: 1px solid var(--border);
@@ -69,7 +71,8 @@ input {
 
 .auth-card h1,
 .topbar h1,
-.note-detail h1 {
+.note-detail h1,
+.video-detail h1 {
   margin: 0;
   font-family: "Fraunces", Georgia, serif;
   letter-spacing: -0.03em;
@@ -133,7 +136,8 @@ button.danger {
   margin-bottom: 1.5rem;
 }
 
-.notes-grid {
+.notes-grid,
+.videos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
@@ -141,15 +145,100 @@ button.danger {
 
 .note-card,
 .note-detail,
+.video-card,
+.video-detail,
 .empty {
   padding: 1.25rem;
 }
 
+.video-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-card-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.video-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  background: var(--surface-2);
+}
+
+.video-thumb-fallback {
+  background:
+    linear-gradient(135deg, rgba(255, 90, 54, 0.35), transparent 55%),
+    var(--surface-2);
+}
+
+.video-thumb-lg {
+  width: min(320px, 100%);
+  border-radius: 12px;
+}
+
+.video-detail-header {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.note-title-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.note-title-list a {
+  color: var(--text);
+}
+
+.note-title-list a:hover {
+  color: var(--accent-2);
+}
+
+.video-note-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.video-note-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.video-note-row h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
 .note-card h2,
 .note-detail h2,
+.video-card h2,
 .empty h2 {
   margin: 0.4rem 0 0.7rem;
   font-size: 1.15rem;
+}
+
+.video-card h2 {
+  margin: 0 0 0.25rem;
 }
 
 .note-meta {
