@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import Shell from '../components/Shell'
 import { useAuth } from '../context/AuthContext'
 import { api, type Note } from '../lib/api'
 
@@ -8,12 +9,20 @@ export default function NoteDetailPage() {
   const { user, loading } = useAuth()
   const [note, setNote] = useState<Note | null>(null)
   const [error, setError] = useState('')
+  const [editing, setEditing] = useState(false)
+  const [title, setTitle] = useState('')
+  const [summary, setSummary] = useState('')
+  const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     if (!user || !id) return
     api
       .getNote(id)
-      .then(({ note }) => setNote(note))
+      .then(({ note }) => {
+        setNote(note)
+        setTitle(note.title || note.video_title || '')
+        setSummary(note.summary_text)
+      })
       .catch((err) =>
         setError(err instanceof Error ? err.message : 'Failed to load note'),
       )
@@ -22,22 +31,59 @@ export default function NoteDetailPage() {
   if (loading) return <main className="page"><p>Loading…</p></main>
   if (!user) return <Navigate to="/login" replace />
 
+  async function handleSave(event: React.FormEvent) {
+    event.preventDefault()
+    if (!id) return
+    setBusy(true)
+    setError('')
+    try {
+      const { note: updated } = await api.updateNote(id, { title, summary_text: summary })
+      setNote(updated)
+      setTitle(updated.title || title)
+      setSummary(updated.summary_text)
+      setEditing(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save the note')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const youtubeSource = note?.source === 'youtube'
+  const backTo = note?.video_id && note.video_id !== 'library'
+    ? `/videos/${encodeURIComponent(note.video_id)}`
+    : '/'
+
   return (
-    <main className="page">
-      <Link
-        to={note?.video_id ? `/videos/${encodeURIComponent(note.video_id)}` : '/'}
-        className="back"
-      >
-        ← Back
-      </Link>
+    <Shell>
+      <Link to={backTo} className="back">← Back</Link>
 
       {error && <div className="error">{error}</div>}
 
       {note && (
         <article className="note-detail">
-          <h1>{note.title || note.video_title || note.video_id}</h1>
-          {note.video_title && note.title && note.title !== note.video_title && (
-            <p className="muted">{note.video_title}</p>
+          {editing ? (
+            <form className="stack" onSubmit={handleSave}>
+              <label>
+                Title
+                <input value={title} onChange={(event) => setTitle(event.target.value)} required />
+              </label>
+              <label>
+                Chat
+                <textarea value={summary} onChange={(event) => setSummary(event.target.value)} rows={12} required />
+              </label>
+              <div className="note-actions">
+                <button type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+                <button type="button" className="ghost" onClick={() => setEditing(false)}>Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <h1>{note.title || note.video_title || note.video_id}</h1>
+              {note.video_title && note.title && note.title !== note.video_title && (
+                <p className="muted">{note.video_title}</p>
+              )}
+            </>
           )}
           <div className="note-meta">
             <span>{note.source}</span>
@@ -47,17 +93,24 @@ export default function NoteDetailPage() {
                 Open in Google Docs
               </a>
             )}
-            {note.video_url && (
+            {youtubeSource && note.video_url && (
               <a href={note.video_url} target="_blank" rel="noreferrer">
-                Open on YouTube
+                Watch
               </a>
             )}
           </div>
+          {!editing && (
+            <div className="note-actions">
+              <button type="button" className="ghost" onClick={() => setEditing(true)}>Edit</button>
+            </div>
+          )}
 
+          {!editing && (
           <section>
             <h2>Summary</h2>
             <pre className="summary">{note.summary_text}</pre>
           </section>
+          )}
 
           {note.sections && note.sections.length > 0 && (
             <section>
@@ -79,6 +132,6 @@ export default function NoteDetailPage() {
           )}
         </article>
       )}
-    </main>
+    </Shell>
   )
 }
