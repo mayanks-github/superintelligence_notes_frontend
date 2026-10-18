@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import Shell from '../components/Shell'
 import { useAuth } from '../context/AuthContext'
 import { api, type Video } from '../lib/api'
 
@@ -48,8 +49,8 @@ export default function VideoDetailPage() {
   }
 
   return (
-    <main className="page">
-      <Link to="/" className="back">← Back to videos</Link>
+    <Shell>
+      <Link to="/" className="back">← Back</Link>
 
       {error && <div className="error">{error}</div>}
 
@@ -103,7 +104,7 @@ export default function VideoDetailPage() {
                         Google Doc
                       </a>
                     )}
-                    {video.video_url && (
+                    {note.source === 'youtube' && video.video_url && (
                       <a href={video.video_url} target="_blank" rel="noreferrer">
                         Watch
                       </a>
@@ -123,6 +124,6 @@ export default function VideoDetailPage() {
           )}
         </article>
       )}
-    </main>
+    </Shell>
   )
 }
