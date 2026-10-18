@@ -14,6 +14,7 @@ type AuthContextValue = {
   loading: boolean
   signInWithGoogle: () => void
   completeLogin: (token: string) => Promise<void>
+  refresh: () => Promise<void>
   logout: () => void
 }
 
@@ -55,14 +56,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const refresh = useCallback(async () => {
+    const { user } = await api.me()
+    setUser(user)
+  }, [])
+
   const logout = useCallback(() => {
     localStorage.removeItem('token')
     setUser(null)
   }, [])
 
   const value = useMemo(
-    () => ({ user, loading, signInWithGoogle, completeLogin, logout }),
-    [user, loading, signInWithGoogle, completeLogin, logout],
+    () => ({ user, loading, signInWithGoogle, completeLogin, refresh, logout }),
+    [user, loading, signInWithGoogle, completeLogin, refresh, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
