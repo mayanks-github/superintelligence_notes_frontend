@@ -193,6 +193,38 @@ export const api = {
 
   getNote: (id: string) => request<{ note: Note }>(`/notes/${id}`),
 
+  downloadNote: async (id: string, format: 'pdf' | 'docx' | 'txt') => {
+    const token = localStorage.getItem('token')
+    const response = await fetch(
+      `${API_URL}/notes/${encodeURIComponent(id)}/download?format=${format}`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      },
+    )
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(body.error || 'Download failed')
+    }
+
+    const blob = await response.blob()
+    const disposition = response.headers.get('Content-Disposition') || ''
+    const utfMatch = disposition.match(/filename\*=UTF-8''([^;]+)/i)
+    const plainMatch = disposition.match(/filename="?([^";]+)"?/i)
+    const filename = decodeURIComponent(
+      utfMatch?.[1] || plainMatch?.[1] || `note.${format}`,
+    )
+
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = filename
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    URL.revokeObjectURL(url)
+  },
+
   deleteNote: (id: string) =>
     request<void>(`/notes/${id}`, { method: 'DELETE' }),
 

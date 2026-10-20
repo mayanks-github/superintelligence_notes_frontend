@@ -4,6 +4,18 @@ import Shell from '../components/Shell'
 import { useAuth } from '../context/AuthContext'
 import { api, type Note } from '../lib/api'
 
+type DownloadFormat = 'pdf' | 'docx' | 'txt'
+
+const DOWNLOAD_OPTIONS: Array<{
+  format: DownloadFormat
+  label: string
+  description: string
+}> = [
+  { format: 'pdf', label: 'PDF', description: 'Best for sharing and printing' },
+  { format: 'docx', label: 'Word', description: 'Editable offline in Word' },
+  { format: 'txt', label: 'Text', description: 'Plain backup, any device' },
+]
+
 export default function NoteDetailPage() {
   const { id } = useParams()
   const { user, loading } = useAuth()
@@ -13,6 +25,8 @@ export default function NoteDetailPage() {
   const [title, setTitle] = useState('')
   const [summary, setSummary] = useState('')
   const [busy, setBusy] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
+  const [downloading, setDownloading] = useState<DownloadFormat | null>(null)
 
   useEffect(() => {
     if (!user || !id) return
@@ -27,6 +41,15 @@ export default function NoteDetailPage() {
         setError(err instanceof Error ? err.message : 'Failed to load note'),
       )
   }, [user, id])
+
+  useEffect(() => {
+    if (!downloadOpen) return
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setDownloadOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [downloadOpen])
 
   if (loading) return <main className="page"><p>Loading…</p></main>
   if (!user) return <Navigate to="/login" replace />
@@ -53,6 +76,20 @@ export default function NoteDetailPage() {
   const backTo = note?.video_id && note.video_id !== 'library'
     ? `/videos/${encodeURIComponent(note.video_id)}`
     : '/'
+
+  async function handleDownload(format: DownloadFormat) {
+    if (!id) return
+    setDownloading(format)
+    setError('')
+    try {
+      await api.downloadNote(id, format)
+      setDownloadOpen(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Download failed')
+    } finally {
+      setDownloading(null)
+    }
+  }
 
   return (
     <Shell>
@@ -102,6 +139,7 @@ export default function NoteDetailPage() {
           {!editing && (
             <div className="note-actions">
               <button type="button" className="ghost" onClick={() => setEditing(true)}>Edit</button>
+              <button type="button" onClick={() => setDownloadOpen(true)}>Download</button>
             </div>
           )}
 
@@ -131,6 +169,48 @@ export default function NoteDetailPage() {
             </section>
           )}
         </article>
+      )}
+
+      {downloadOpen && (
+        <div
+          className="download-sheet-backdrop"
+          role="presentation"
+          onClick={() => downloading === null && setDownloadOpen(false)}
+        >
+          <div
+            className="download-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="download-sheet-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="download-sheet-header">
+              <h2 id="download-sheet-title">Choose a format</h2>
+              <button
+                type="button"
+                className="ghost"
+                disabled={downloading !== null}
+                onClick={() => setDownloadOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="download-sheet-options">
+              {DOWNLOAD_OPTIONS.map((option) => (
+                <button
+                  key={option.format}
+                  type="button"
+                  className="download-sheet-card"
+                  disabled={downloading !== null}
+                  onClick={() => handleDownload(option.format)}
+                >
+                  <strong>{downloading === option.format ? 'Downloading…' : option.label}</strong>
+                  <span>{option.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </Shell>
   )
